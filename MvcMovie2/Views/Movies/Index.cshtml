@@ -53,8 +53,8 @@
                     <select ng-model="movieGenre" >
                         <option ng-repeat="x in myMovies | unique:'Genre'" value="<a href='{{ x.Genre }}">{{ x.Genre }}</option>
                     </select>
-                    <span id="">Title: <input ng-model="Movies" /></span> <br /> 
-                    <input type="submit" value="Filter" />
+                    <span>Title: <input ng-model="Movies" /></span> <br /> 
+                    <input  type="submit" value="Filter"/>
                 </form>
    
 
@@ -120,7 +120,6 @@
             angular.forEach(collection, function (item) {
                 var key = item[keyname];
                 
-                // look up indexOf
                 if (keys.indexOf(key) === -1) {
                     keys.push(key);
                     
@@ -167,33 +166,34 @@
 
     });
 
-    //angular.module('searchFilter', [])
-    //    .controller('MovieAngularController', ['$scope', function ($scope) {
-    //    if (input != null && genre = null) {
-    //        for (i = 0; i <= $scope.myMovies.length - 1; i++) {
-    //            if (input == movie.MovieName) {
-    //            display movie //(or do I do this the opposite way and splice the ones that don't match?)
-    //        }
-    //    }
-    //}
-    //    else if (input = null && genre != null) {
-    //        for (i = 0; i <= $scope.myMovies.length - 1; i++) {
-    //            if (genre == movie.Genre) {
-    //                display movie
-    //            }
-    //        }
-    //    }
-    //    else if (input != null && genre != null) {
-    //        for (i = 0; i <= $scope.myMovies.length - 1; i++) {
-    //            if (input == movie.MovieName && genre == movie.Genre) {
-    //                display movie
-    //            }
-    //        }
-    //    }
-    //      else {
-    //         do nothing
-    //        }
-    //    }
-    //}
-    //    }
+   angular.module('SearchFilter', function())
+        .controller('SearchController', ['$scope', function ($scope) {
+        if (searchinput != null && genrelist == null) {
+            for (i = 0; i <= $scope.mymovies.length - 1; i++) {
+                if (searchinput != movie.moviename) {
+                $scope.mymovie.splice(movie);
+
+            }
+        }
+    }
+        else if (searchinput == null && genrelist != null) {
+            for (i = 0; i <= $scope.mymovies.length - 1; i++) {
+                if (genrelist != movie.genre) {
+                    $scope.mymovie.splice(movie);
+                }
+            }
+        }
+        else if (searchinput != null && genrelist != null) {
+            for (i = 0; i <= $scope.mymovies.length - 1; i++) {
+                if (searchinput != movie.moviename && genrelist != movie.genre) {
+                    $scope.mymovie.splice(movie);
+                }
+            }
+        }
+          else {
+             $scope.getMovies();
+            }
+        }
+    }
+        }
 </script>
