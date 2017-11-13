@@ -1,0 +1,199 @@
+﻿@model IEnumerable<MvcMovie2.Models.Movie>
+
+@*@{
+    ViewBag.Title = "Movie List";
+}*@
+<div ng-app="MyMovieApp" ng-controller="MovieAngularController">
+    <h2>My Movie List</h2>
+
+   @*<p>
+        @Html.ActionLink("Create New", "Create")
+
+        @using (Html.BeginForm("index","movies",FormMethod.Get))
+            {
+                <p>
+                    genre: @Html.DropDownList("movieGenre", "all")
+                    title: @Html.TextBox("searchstring") <br /> //
+                    <input type="submit" value="filter" />
+                </p>
+            }
+
+    <table class="table">
+        @foreach (var movie in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => movie.MovieName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => movie.ReleaseDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => movie.Genre)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => movie.Price)
+                </td>
+                <th>
+                    @Html.DisplayFor(modelItem => movie.Rating)
+                </th>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = movie.ID }) |
+                    @Html.ActionLink("Details", "Details", new { id = movie.ID })  |
+                    @Html.ActionLink("Delete", "Delete", new { id = movie.ID })
+                </td>
+            </tr>
+        }
+    </table>*@
+
+    <a href="/Movies/Create">Add New Movie</a>
+     
+              
+                <form>
+                    <select ng-model="movieGenre" >
+                        <option ng-repeat="x in myMovies | unique:'Genre'" value="<a href='{{ x.Genre }}">{{ x.Genre }}</option>
+                    </select>
+                    <span id="">Title: <input ng-model="Movies" /></span> <br /> 
+                    <input type="submit" value="Filter" />
+                </form>
+   
+
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Title
+                </th>
+                <th>
+                    Release Date
+                </th>
+                <th>
+                    Genre
+                </th>
+                <th>
+                    Rating
+                </th>
+                <th>
+                    Price
+                </th>
+
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="movie in myMovies">
+                <td>
+                    {{ movie.MovieName }}
+                </td>
+                <td>
+                    {{ movie.ReleaseDate | date }}
+                </td>
+                <td>
+                    {{ movie.Genre }}
+                </td>
+                <td>
+                    {{ movie.Rating }}
+                </td>
+                <td>
+                    {{ movie.Price | currency }}
+                </td>
+                <td>
+                   <a href="Movies/Edit/{{ movie.Id }}">edit</a> |              @*method/parameters*@
+                    <a href="Movies/Details/{{ movie.Id }}">details</a> |
+                    <a href="Movies/Delete/{{ movie.Id }}">delete</a> 
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/angular-ui/0.4.0/angular-ui.min.js"></script>
+<script>
+    var app = angular.module("MyMovieApp", []);
+
+    app.filter('unique', function () {
+        return function (collection, keyname) {
+            var output = [];
+            keys = [];
+
+            angular.forEach(collection, function (item) {
+                var key = item[keyname];
+                
+                // look up indexOf
+                if (keys.indexOf(key) === -1) {
+                    keys.push(key);
+                    
+
+                    output.push(item);
+                }
+            });
+
+            return output;
+
+        }
+    });
+
+    //app.filter("date", function () {
+    //    var dateStrings = [];
+    //    for (i = 0; i <= myMovies.length; i++) {
+    //        var milli = movie.ReleaseDate.replace(/\/Date\((-?\d+)\)\//, '$1');
+    //        var d = new Date(parseInt(milli));
+    //        dateStrings.push(d);
+    //    }
+    //    return dateStrings;
+    //});
+
+    app.controller("MovieAngularController", function ($scope, $http) {
+        $scope.myMovies = [];
+        $scope.getMovies = function () {
+            $http({ method: "GET", url: "/Movies/GetMovies" }).then(function (data) {
+                $scope.myMovies = data.data; //api call
+                //console.log($scope.myMovies[0]["ReleaseDate"]);
+                // var list = $scope.myMovies;
+                for (i = 0; i <= $scope.myMovies.length - 1; i++) {
+                    var milli = $scope.myMovies[i]["ReleaseDate"];
+                    console.log(milli);
+                    var result = milli.replace(/\/Date\((-?\d+)\)\//, '$1');
+                    var dateFormat = new Date(parseInt(result));
+                    $scope.myMovies[i]["ReleaseDate"] = dateFormat;
+
+                };
+            });
+
+        };
+
+        $scope.getMovies();
+
+    });
+
+    //angular.module('searchFilter', [])
+    //    .controller('MovieAngularController', ['$scope', function ($scope) {
+    //    if (input != null && genre = null) {
+    //        for (i = 0; i <= $scope.myMovies.length - 1; i++) {
+    //            if (input == movie.MovieName) {
+    //            display movie //(or do I do this the opposite way and splice the ones that don't match?)
+    //        }
+    //    }
+    //}
+    //    else if (input = null && genre != null) {
+    //        for (i = 0; i <= $scope.myMovies.length - 1; i++) {
+    //            if (genre == movie.Genre) {
+    //                display movie
+    //            }
+    //        }
+    //    }
+    //    else if (input != null && genre != null) {
+    //        for (i = 0; i <= $scope.myMovies.length - 1; i++) {
+    //            if (input == movie.MovieName && genre == movie.Genre) {
+    //                display movie
+    //            }
+    //        }
+    //    }
+    //      else {
+    //         do nothing
+    //        }
+    //    }
+    //}
+    //    }
+</script>
