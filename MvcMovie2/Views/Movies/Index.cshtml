@@ -49,13 +49,13 @@
     <a href="/Movies/Create">Add New Movie</a>
      
               
-                <form>
+                
                     <select ng-model="movieGenre" >
-                        <option ng-repeat="x in myMovies | unique:'Genre'" value="<a href='{{ x.Genre }}">{{ x.Genre }}</option>
+                        <option class="movieGenre" ng-repeat="x in GenreList" ng-click="FilterMovies(x)" value="<a href='/Movies/FilterMovies/{{ x }}'">{{ x }}</option>
                     </select>
                     <span>Title: <input ng-model="Movies" /></span> <br /> 
-                    <input  type="submit" value="Filter"/>
-                </form>
+                    <div class="btn btn-primary" ng-click="FilterMovies(this)">Filter</div>
+               
    
 
 
@@ -86,7 +86,7 @@
                     {{ movie.MovieName }}
                 </td>
                 <td>
-                    {{ movie.ReleaseDate | date }}
+                    {{ movie.StringReleaseDate }}
                 </td>
                 <td>
                     {{ movie.Genre }}
@@ -143,57 +143,85 @@
     //    return dateStrings;
     //});
 
-    app.controller("MovieAngularController", function ($scope, $http) {
-        $scope.myMovies = [];
-        $scope.getMovies = function () {
-            $http({ method: "GET", url: "/Movies/GetMovies" }).then(function (data) {
-                $scope.myMovies = data.data; //api call
-                //console.log($scope.myMovies[0]["ReleaseDate"]);
-                // var list = $scope.myMovies;
-                for (i = 0; i <= $scope.myMovies.length - 1; i++) {
-                    var milli = $scope.myMovies[i]["ReleaseDate"];
-                    console.log(milli);
-                    var result = milli.replace(/\/Date\((-?\d+)\)\//, '$1');
-                    var dateFormat = new Date(parseInt(result));
-                    $scope.myMovies[i]["ReleaseDate"] = dateFormat;
 
-                };
-            });
+    app.factory('movieangularfactory', function ($http) {
+        return {
+            getMovies: function (callback) {
+                $http({ method: "GET", url: "/Movies/GetMovies" }).then(function (data) {
+                    callback(data.data);
+                });
+            },
+            FilterMovies: function (Genre, callback) {
+                $http({ method: "POST", url: "/Movies/FilterMovies", data: Genre }).then(function (data) {
+                    callback(data.data);
+                });
+            },
+            GetGenres: function (callback) {
+                $http({ method: "GET", url: "/Movies/GetGenreList" }).then(function (data) {
+                    callback(data);
+                });
+            }
+        }
+    });
+
+
+    app.controller("MovieAngularController", function ($scope, $http, movieangularfactory) {
+        $scope.myMovies = [];
+        $scope.GenreList = [];
+
+        $scope.getMovies = function (callback) {
+            movieangularfactory.getMovies(callback);
+               
+        };
+
+        $scope.GetGenres = function (callback) {
+            movieangularfactory.GetGenres(callback);
 
         };
 
-        $scope.getMovies();
+        $scope.setMovies = function (response) {
+            $scope.myMovies = response;
+        }
+        $scope.FilterMovies = function (Genre) {
+            movieangularfactory.FilterMovies(Genre, $scope.setMovies);
+        }
+        $scope.setGenres = function (response) {
+            $scope.GenreList = response;
+        }
+       
+        $scope.getMovies($scope.setMovies);
+        $scope.GetGenres($scope.setGenres);
 
     });
 
-   angular.module('SearchFilter', function())
-        .controller('SearchController', ['$scope', function ($scope) {
-        if (searchinput != null && genrelist == null) {
-            for (i = 0; i <= $scope.mymovies.length - 1; i++) {
-                if (searchinput != movie.moviename) {
-                $scope.mymovie.splice(movie);
+   //angular.module('SearchFilter', function())
+   //     .controller('SearchController', ['$scope', function ($scope) {
+   //     if (searchinput != null && genrelist == null) {
+   //         for (i = 0; i <= $scope.mymovies.length - 1; i++) {
+   //             if (searchinput != movie.moviename) {
+   //             $scope.mymovie.splice(movie);
 
-            }
-        }
-    }
-        else if (searchinput == null && genrelist != null) {
-            for (i = 0; i <= $scope.mymovies.length - 1; i++) {
-                if (genrelist != movie.genre) {
-                    $scope.mymovie.splice(movie);
-                }
-            }
-        }
-        else if (searchinput != null && genrelist != null) {
-            for (i = 0; i <= $scope.mymovies.length - 1; i++) {
-                if (searchinput != movie.moviename && genrelist != movie.genre) {
-                    $scope.mymovie.splice(movie);
-                }
-            }
-        }
-          else {
-             $scope.getMovies();
-            }
-        }
-    }
-        }
+   //         }
+   //     }
+   // }
+   //     else if (searchinput == null && genrelist != null) {
+   //         for (i = 0; i <= $scope.mymovies.length - 1; i++) {
+   //             if (genrelist != movie.genre) {
+   //                 $scope.mymovie.splice(movie);
+   //             }
+   //         }
+   //     }
+   //     else if (searchinput != null && genrelist != null) {
+   //         for (i = 0; i <= $scope.mymovies.length - 1; i++) {
+   //             if (searchinput != movie.moviename && genrelist != movie.genre) {
+   //                 $scope.mymovie.splice(movie);
+   //             }
+   //         }
+   //     }
+   //       else {
+   //          $scope.getMovies();
+   //         }
+   //     }
+    //}
+    //    }
 </script>

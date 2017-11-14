@@ -32,5 +32,8 @@ namespace MvcMovie2.Models
         [Range(1, 100)]
         [DataType(DataType.Currency)]
         public double Price { get; set; }
+
+        [NotMapped]
+        public string StringReleaseDate { get; set; }
     }
 }

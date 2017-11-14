@@ -46,7 +46,31 @@ namespace MvcMovie2.Controllers
         public ActionResult GetMovies()
         {
             List<Movie> movies = db.Movies.ToList();
+            foreach(Movie movie in movies)
+            {
+                movie.StringReleaseDate = movie.ReleaseDate.ToShortDateString();
+            }
             return Json(movies, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult FilterMovies(string Genre)
+        {
+            List<Movie> Movies = db.Movies.Where(x => x.Genre == Genre).ToList();
+            return Json(Movies, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult GetGenreList()
+        {
+            List<Movie> Movies = db.Movies.ToList();
+            List<string> GenreNames = new List<string>();
+            foreach( Movie movie in Movies)
+            {
+                if (GenreNames.IndexOf(movie.Genre) == -1)
+                {
+                    GenreNames.Add(movie.Genre);
+                }
+            }
+            return Json(GenreNames, JsonRequestBehavior.AllowGet);
         }
 
         // GET: Movies/Details/5
