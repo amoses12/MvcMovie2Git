@@ -3,7 +3,7 @@
 @*@{
     ViewBag.Title = "Movie List";
 }*@
-<div ng-app="MyMovieApp" ng-controller="MovieAngularController">
+<div ng-app="MyMovieApp" ng-controller="MyMovieAppController">
     <h2>My Movie List</h2>
 
    @*<p>
@@ -47,18 +47,16 @@
     </table>*@
 
     <a href="/Movies/Create">Add New Movie</a>
-     
-              
-                <form>
-                    <select ng-model="movieGenre" >
-                        <option ng-repeat="x in myMovies | unique:'Genre'" value="<a href='{{ x.Genre }}">{{ x.Genre }}</option>
-                    </select>
-                    <span>Title: <input ng-model="Movies" /></span> <br /> 
-                    <input  type="submit" value="Filter"/>
-                </form>
+    
+        <form>
+            <select ng-model="movieGenre">
+                <option ng-repeat="x in myMovies | unique:'Genre'" value="<a href='{{ x.Genre }}'/>">{{ x.Genre }}</option>
+            </select>
+            <span>Title: <input ng-model="Movies" /></span> <br />
+            <button type="button" ng-Click="SearchFilter(Movies, movieGenre)">Filter</button>
+        </form>
    
-
-
+    
     <table class="table">
         <thead>
             <tr>
@@ -105,95 +103,68 @@
             </tr>
         </tbody>
     </table>
+       
 </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
 <script src="http://cdnjs.cloudflare.com/ajax/libs/angular-ui/0.4.0/angular-ui.min.js"></script>
+<script src="\Scripts\MoviesAngularController.js"></script>
 <script>
-    var app = angular.module("MyMovieApp", []);
 
-    app.filter('unique', function () {
-        return function (collection, keyname) {
-            var output = [];
-            keys = [];
+    
 
-            angular.forEach(collection, function (item) {
-                var key = item[keyname];
-                
-                if (keys.indexOf(key) === -1) {
-                    keys.push(key);
-                    
+    //app.controller("MovieAngularController", function ($scope, $http) {
+    //    $scope.myMovies = [];
+    //    $scope.getMovies = function () {
+    //        $http({ method: "GET", url: "/Movies/GetMovies" }).then(function (data) {
+    //            $scope.myMovies = data.data; //api call
+    //            //console.log($scope.myMovies[0]["ReleaseDate"]);
+    //            // var list = $scope.myMovies;
+    //            for (i = 0; i <= $scope.myMovies.length - 1; i++) {
+    //                var milli = $scope.myMovies[i]["ReleaseDate"];
+    //                console.log(milli);
+    //                var result = milli.replace(/\/Date\((-?\d+)\)\//, '$1');
+    //                var dateFormat = new Date(parseInt(result));
+    //                $scope.myMovies[i]["ReleaseDate"] = dateFormat;
 
-                    output.push(item);
-                }
-            });
+    //            };
+    //        });
 
-            return output;
+    //    };
 
-        }
-    });
+    //    $scope.getMovies();
 
-    //app.filter("date", function () {
-    //    var dateStrings = [];
-    //    for (i = 0; i <= myMovies.length; i++) {
-    //        var milli = movie.ReleaseDate.replace(/\/Date\((-?\d+)\)\//, '$1');
-    //        var d = new Date(parseInt(milli));
-    //        dateStrings.push(d);
-    //    }
-    //    return dateStrings;
     //});
 
-    app.controller("MovieAngularController", function ($scope, $http) {
-        $scope.myMovies = [];
-        $scope.getMovies = function () {
-            $http({ method: "GET", url: "/Movies/GetMovies" }).then(function (data) {
-                $scope.myMovies = data.data; //api call
-                //console.log($scope.myMovies[0]["ReleaseDate"]);
-                // var list = $scope.myMovies;
+    @*angular.module('SearchFilter', function () {
+        .controller('MovieAngularController', ['$scope', function ($scope) {
+            $scope.searchResult = [];
+            if (searchInput == null && genreList != null) {
                 for (i = 0; i <= $scope.myMovies.length - 1; i++) {
-                    var milli = $scope.myMovies[i]["ReleaseDate"];
-                    console.log(milli);
-                    var result = milli.replace(/\/Date\((-?\d+)\)\//, '$1');
-                    var dateFormat = new Date(parseInt(result));
-                    $scope.myMovies[i]["ReleaseDate"] = dateFormat;
+                    if (searchInput != movie.MovieName) {
+                        $scope.searchResult.push(movie);
 
-                };
-            });
-
-        };
-
-        $scope.getMovies();
-
-    });
-
-   angular.module('SearchFilter', function())
-        .controller('SearchController', ['$scope', function ($scope) {
-        if (searchinput != null && genrelist == null) {
-            for (i = 0; i <= $scope.mymovies.length - 1; i++) {
-                if (searchinput != movie.moviename) {
-                $scope.mymovie.splice(movie);
-
-            }
-        }
-    }
-        else if (searchinput == null && genrelist != null) {
-            for (i = 0; i <= $scope.mymovies.length - 1; i++) {
-                if (genrelist != movie.genre) {
-                    $scope.mymovie.splice(movie);
+                    }
                 }
             }
-        }
-        else if (searchinput != null && genrelist != null) {
-            for (i = 0; i <= $scope.mymovies.length - 1; i++) {
-                if (searchinput != movie.moviename && genrelist != movie.genre) {
-                    $scope.mymovie.splice(movie);
+            else if (searchInput != null && genreList == null) {
+                for (i = 0; i <= $scope.myMovies.length - 1; i++) {
+                    if (genreList != movie.Genre) {
+                        $scope.searchResult.push(movie);
+                    }
                 }
             }
-        }
-          else {
-             $scope.getMovies();
+            else if (searchInput != null && genreList != null) {
+                for (i = 0; i <= $scope.myMovies.length - 1; i++) {
+                    if (searchInput === movie.MovieName && genreList === movie.Genre) {
+                        $scope.searchResult.push(movie);
+                    }
+                }
             }
+            else {
+                $scope.getMovies();
+            }
+            $scope.myMovies = $scope.searchResult
         }
-    }
-        }
+      });*@
 </script>
