@@ -56,18 +56,37 @@ namespace MvcMovie2.Controllers
         public ActionResult FilterMovies(MovieFilter Filter)
         {
             List<Movie> Movies = new List<Movie>();
-            if (!string.IsNullOrEmpty(Filter.Genre))
+             if (!string.IsNullOrEmpty(Filter.Genre))
             {
                 Movies = db.Movies.Where(x => x.Genre == Filter.Genre).ToList();
                 if (!string.IsNullOrEmpty(Filter.Title))
                 {
                     Movies = Movies.Where(x => x.MovieName == Filter.Title).ToList();
+                    if (!string.IsNullOrEmpty(Filter.Rating))
+                    {
+                        Movies = Movies.Where(x => x.Rating == Filter.Rating).ToList();
+                    }
+               
                 }
+                else if (!string.IsNullOrEmpty(Filter.Rating))
+                {
+                    Movies = Movies.Where(x => x.Rating == Filter.Rating).ToList();
+                }
+
             }
             else if (!string.IsNullOrEmpty(Filter.Title))
             {
                  Movies = db.Movies.Where(x => x.MovieName == Filter.Title).ToList();
+                 if (!string.IsNullOrEmpty(Filter.Rating))
+                {
+                    Movies = Movies.Where(x => x.Rating == Filter.Rating).ToList();
+                }
             }
+            else if (!string.IsNullOrEmpty(Filter.Rating))
+            {
+                Movies = db.Movies.Where(x => x.Rating == Filter.Rating).ToList();
+            }
+
 
             return Json(Movies, JsonRequestBehavior.AllowGet);
         }
@@ -85,6 +104,20 @@ namespace MvcMovie2.Controllers
                 }
             }
             return Json(GenreNames, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult GetRatingList()
+        {
+            List<Movie> Movies = db.Movies.ToList();
+            List<string> Ratings = new List<string>();
+            foreach( Movie movie in Movies )
+            {
+                if (Ratings.IndexOf(movie.Rating) == -1)
+                {
+                    Ratings.Add(movie.Rating);
+                }
+            }
+            return Json(Ratings, JsonRequestBehavior.AllowGet);
         }
 
         // GET: Movies/Details/5

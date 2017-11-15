@@ -47,11 +47,17 @@
     </table>*@
 
     <a href="/Movies/Create">Add New Movie</a>
+    <br />
      
               
                 
-                    <select ng-model="movieGenre" >
-                        <option class="movieGenre" ng-repeat="x in GenreList" ng-click="FilterMovies(x)" value="<a href='/Movies/FilterMovies/{{ x }}">{{ x }}</option>
+                    <select class="movieGenreDrop">
+                        <option value="">- Select Genre -</option>
+                        <option class="movieGenre" ng-repeat="x in GenreList" ng-click="FilterMovies(x)" value="<a href='/Movies/FilterMovies/{{ x }}'">{{ x }}</option>
+                    </select>
+                    <select class="movieRatingDrop">
+                        <option value="">- Select Rating -</option>
+                        <option class="movieRating" ng-repeat="x in RatingsList" ng-click="FilterMovies(x)" value="<a href='/Movies/FilterMovies/{{ x }}'">{{ x }}</option>
                     </select>
                     <span>Title: <input id="TitleInput" ng-model="Movies" /></span> <br /> 
                     <div class="btn btn-primary" ng-click="FilterMovies()">Filter</div>
@@ -160,6 +166,11 @@
                 $http({ method: "GET", url: "/Movies/GetGenreList" }).then(function (data) {
                     callback(data);
                 });
+            },
+            GetRatings: function (callback) {
+                $http({ method: "GET", url: "/Movies/GetRatingList" }).then(function (data) {
+                    callback(data);
+                });
             }
         }
     });
@@ -168,6 +179,7 @@
     app.controller("MovieAngularController", function ($scope, $http, movieangularfactory) {
         $scope.myMovies = [];
         $scope.GenreList = [];
+        $scope.RatingsList = [];
         $scope.Filter = {};
 
         $scope.getMovies = function (callback) {
@@ -180,20 +192,29 @@
 
         };
 
+        $scope.GetRatings = function (callback) {
+            movieangularfactory.GetRatings(callback);
+        }
+
         $scope.setMovies = function (response) {
             $scope.myMovies = response;
         }
         $scope.FilterMovies = function () {
-            $scope.Filter.Genre = $('select').find(':selected').text();
+            $scope.Filter.Genre = $('.movieGenreDrop').find(':selected').text();
+            $scope.Filter.Rating = $('.movieRatingDrop').find(':selected').text();
             $scope.Filter.Title = $('#TitleInput').val();
             movieangularfactory.FilterMovies($scope.Filter, $scope.setMovies);
         }
         $scope.setGenres = function (response) {
             $scope.GenreList = response.data;
         }
+        $scope.setRatings = function (response) {
+            $scope.RatingsList = response.data;
+        }
        
         $scope.getMovies($scope.setMovies);
         $scope.GetGenres($scope.setGenres);
+        $scope.GetRatings($scope.setRatings);
 
     });
 
