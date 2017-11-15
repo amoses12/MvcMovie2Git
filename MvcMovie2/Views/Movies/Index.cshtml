@@ -51,10 +51,10 @@
               
                 
                     <select ng-model="movieGenre" >
-                        <option class="movieGenre" ng-repeat="x in GenreList" ng-click="FilterMovies(x)" value="<a href='/Movies/FilterMovies/{{ x }}'">{{ x }}</option>
+                        <option class="movieGenre" ng-repeat="x in GenreList" ng-click="FilterMovies(x)" value="<a href='/Movies/FilterMovies/{{ x }}">{{ x }}</option>
                     </select>
-                    <span>Title: <input ng-model="Movies" /></span> <br /> 
-                    <div class="btn btn-primary" ng-click="FilterMovies(this)">Filter</div>
+                    <span>Title: <input id="TitleInput" ng-model="Movies" /></span> <br /> 
+                    <div class="btn btn-primary" ng-click="FilterMovies()">Filter</div>
                
    
 
@@ -151,8 +151,8 @@
                     callback(data.data);
                 });
             },
-            FilterMovies: function (Genre, callback) {
-                $http({ method: "POST", url: "/Movies/FilterMovies", data: Genre }).then(function (data) {
+            FilterMovies: function (Filter, callback) {
+                $http({ method: "POST", url: "/Movies/FilterMovies", data: Filter }).then(function (data) {
                     callback(data.data);
                 });
             },
@@ -168,6 +168,7 @@
     app.controller("MovieAngularController", function ($scope, $http, movieangularfactory) {
         $scope.myMovies = [];
         $scope.GenreList = [];
+        $scope.Filter = {};
 
         $scope.getMovies = function (callback) {
             movieangularfactory.getMovies(callback);
@@ -182,11 +183,13 @@
         $scope.setMovies = function (response) {
             $scope.myMovies = response;
         }
-        $scope.FilterMovies = function (Genre) {
-            movieangularfactory.FilterMovies(Genre, $scope.setMovies);
+        $scope.FilterMovies = function () {
+            $scope.Filter.Genre = $('select').find(':selected').text();
+            $scope.Filter.Title = $('#TitleInput').val();
+            movieangularfactory.FilterMovies($scope.Filter, $scope.setMovies);
         }
         $scope.setGenres = function (response) {
-            $scope.GenreList = response;
+            $scope.GenreList = response.data;
         }
        
         $scope.getMovies($scope.setMovies);

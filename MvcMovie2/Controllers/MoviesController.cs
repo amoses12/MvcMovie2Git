@@ -53,19 +53,33 @@ namespace MvcMovie2.Controllers
             return Json(movies, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult FilterMovies(string Genre)
+        public ActionResult FilterMovies(MovieFilter Filter)
         {
-            List<Movie> Movies = db.Movies.Where(x => x.Genre == Genre).ToList();
+            List<Movie> Movies = new List<Movie>();
+            if (!string.IsNullOrEmpty(Filter.Genre))
+            {
+                Movies = db.Movies.Where(x => x.Genre == Filter.Genre).ToList();
+                if (!string.IsNullOrEmpty(Filter.Title))
+                {
+                    Movies = Movies.Where(x => x.MovieName == Filter.Title).ToList();
+                }
+            }
+            else if (!string.IsNullOrEmpty(Filter.Title))
+            {
+                 Movies = db.Movies.Where(x => x.MovieName == Filter.Title).ToList();
+            }
+
             return Json(Movies, JsonRequestBehavior.AllowGet);
         }
 
+      
         public ActionResult GetGenreList()
         {
             List<Movie> Movies = db.Movies.ToList();
             List<string> GenreNames = new List<string>();
             foreach( Movie movie in Movies)
             {
-                if (GenreNames.IndexOf(movie.Genre) == -1)
+                if (GenreNames.IndexOf(movie.Genre) == -1) //!GenreNames.Contains(movie.Genre)
                 {
                     GenreNames.Add(movie.Genre);
                 }
