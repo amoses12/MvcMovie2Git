@@ -1,74 +1,89 @@
-﻿@model MvcMovie2.Models.Movie
+﻿
+        <div ng-app="MyMovieApp" ng-controller="EditMovieController">
+            <form>
+                <div class="form-vertical">
+                    <h4>Movie</h4>
+                    <hr />
+                    <div class="form-group">
+                        <label for="Edit-Title-Input">Title:</label>
+                        <input type="text" ng-value="{{ EditDetails.MovieName }}" class="form-control" id="Edit-Title-Input" />
+                    </div>
 
-@{
-    ViewBag.Title = "Edit";
-}
+                    <div class="form-group">
+                        <label for="Edit-Date-Input">Release Date:</label>
+                        <input type="text" ng-value="{{ EditDetails.ReleaseDate }}" class="form-control" id="Edit-Date-Input" />
+                    </div>
 
-<h2>Edit</h2>
+                    <div class="form-group">
+                        <label for="Edit-Genre-Input">Genre:</label>
+                        <input type="text" ng-value="{{ EditDetails.Genre }}" class="form-control" id="Edit-Genre-Input" />
+                    </div>
 
+                    <div class="form-group">
+                        <label for="Edit-Rating-Input">Rating:</label>
+                        <input type="text" ng-value="{{ EditDetails.Rating }}" class="form-control" id="Edit-Rating-Input" />
+                    </div>
 
-@using (Html.BeginForm())
-{
-    @Html.AntiForgeryToken()
-    
-    <div class="form-horizontal">
-        <h4>Movie</h4>
-        <hr />
-        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-        @Html.HiddenFor(model => model.Id)
+                    <div class="form-group">
+                        <label for="Edit-Price-Input">Price:</label>
+                        <input type="text" ng-value="{{ EditDetails.Price }}" class="form-control" id="Edit-Price-Input" />
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.MovieName, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.MovieName, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.MovieName, "", new { @class = "text-danger" })
-            </div>
+                    </div>
+                    <div class="form-group">
+                        <div ng-click="MovieEdit()" class="btn btn-primary">Update</div>
+
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div>
+            <a href="/Movies/Index">Back to List</a>
         </div>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.ReleaseDate, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.ReleaseDate, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.ReleaseDate, "", new { @class = "text-danger" })
-            </div>
-        </div>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/angular-ui/0.4.0/angular-ui.min.js"></script>
+        <script>
+            var app = angular.module('MyMovieApp', []);
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.Genre, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.Genre, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.Genre, "", new { @class = "text-danger" })
-            </div>
-        </div>
+            app.factory('editmoviefactory', function ($http) {
+                return {
+                    GetEdit: function (ID, callback) {
+                        $http({ method: "GET", url: "/Movies/Details/" + ID }).then(function (data) {
+                            callback(data);
+                        });
+                    },
+                    SetEdit: function (ID, callback) {
+                        $http({ method: "POST", url: "/Movies/Edit/" + ID }).then(function (data) {
+                            callback(data);
+                        });
+                    }
+                }
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.Rating, new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.Rating, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.Rating, "", new { @class = "text-danger" })
-            </div>
-        </div>
+             });
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.Price, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.Price, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.Price, "", new { @class = "text-danger" })
-            </div>
-        </div>
+            app.controller('EditMovieController', function ($scope, $http, editmoviefactory) {
+                $scope.EditDetails = {};
+                $scope.movie = {};
+                $scope.URL = window.location.href
+                $scope.MovieId = $scope.URL.substring($scope.URL.lastIndexOf('/') + 1);
 
-        <div class="form-group">
-            <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Save" class="btn btn-default" />
-            </div>
-        </div>
-    </div>
-}
-
-<div>
-    @Html.ActionLink("Back to List", "Index")
-</div>
-
-@section Scripts {
-    @Scripts.Render("~/bundles/jqueryval")
-}
+                $scope.GetEditDetail = function (callback) {
+                    editmoviefactory.GetEdit($scope.MovieId, callback);
+                }
+                $scope.SetEditDetails = function (response) {
+                    $scope.EditDetails = response.data;
+                }
+                $scope.DisplayEditDetails = function () {
+                    editmoviefactory.ShowDetails($scope.EditDetails, $scope.SetEditDetails);
+                }
+                $scope.MovieEdit = function () {
+                    $scope.movie.MovieName = $('#Edit-Title-Input').val();
+                    $scope.movie.ReleaseDate = $('#Edit-Date-Input').val();
+                    $scope.movie.Genre = $('#Edit-Genre-Input').val();
+                    $scope.movie.Rating = $('#Edit-Rating-Input').val();
+                    $scope.movie.Price = $('#Edit-Price-Input').val();
+                    editmoviefactory.SetEdit($scope.movie, $scope.SetEditDetails);
+                }
+                $scope.GetEditDetail($scope.SetEditDetails);
+            });
+        </script>

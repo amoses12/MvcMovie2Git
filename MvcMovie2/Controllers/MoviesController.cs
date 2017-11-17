@@ -18,28 +18,7 @@ namespace MvcMovie2.Controllers
         // GET: Movies
         public ActionResult Index()
         {
-            //var GenreLst = new List<string>(); //creates new list of Genres empty list
-
-            //var GenreQry = from d in myMovies //LINQ query retreieves genre of each movie in database (what is d?)
-            //               orderby d.Genre
-            //               select d.Genre;
-
-            //GenreLst.AddRange(GenreQry.Distinct()); //adds a distinct filter to only use distinct genres
-            //ViewBag.movieGenre = new SelectList(GenreLst); //stores list of genres as a SelectList object (dropdown menu) in ViewBag.movieGenre object
-
-            //var movies = from m in db.Movies //LINQ query retrieves movies from database (what is m?)
-            //             select m;
-
-            //if (!String.IsNullOrEmpty(searchString))
-            //{
-            //    movies = movies.Where(s => s.MovieName.Contains(searchString));
-            //}
-
-            //if (!string.IsNullOrEmpty(movieGenre))
-            //{
-            //    movies = movies.Where(x => x.Genre == movieGenre); //checks movieGenre parameter (what is x?)
-            //}
-
+         
             return View();
         }
 
@@ -121,18 +100,24 @@ namespace MvcMovie2.Controllers
         }
 
         // GET: Movies/Details/5
-        public ActionResult Details(int? id)
+        public ActionResult GetMovieDetails(int? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
             Movie movie = db.Movies.Find(id); //Find method verifies that a movie has been found before the code trieds to do anything with it. keeps hackers from changing url and messing with database
+            movie.StringReleaseDate = movie.ReleaseDate.ToShortDateString();
             if (movie == null)
             {
                 return HttpNotFound();
             }
-            return View(movie);
+            return Json(movie, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult Details(int? id)
+        {
+            return View();
         }
 
         // GET: Movies/Create
@@ -146,16 +131,17 @@ namespace MvcMovie2.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Id,MovieName,ReleaseDate,Genre,Rating,Price")] Movie movie) //displays initial create form
+        public ActionResult Create(Movie movie) //displays initial create form
         {
-            if (ModelState.IsValid) //checks for any validation errors and redirects back to create form if there are. Otherwas it..
+            if (ModelState.IsValid)
             {
+
                 db.Movies.Add(movie); //adds movie to database
                 db.SaveChanges();   //saves changes to database
-                return RedirectToAction("Index");   //returns back to index view with saved changes
+                return RedirectToAction("Index");                //returns back to index view with saved changes
             }
-
-            return View(movie); //returns movie view
+           
+            return View("Index"); //returns movie view
         }
 
         // GET: Movies/Edit/5
@@ -164,7 +150,7 @@ namespace MvcMovie2.Controllers
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
+            } 
             Movie movie = db.Movies.Find(id);
             if (movie == null)
             {
@@ -177,8 +163,8 @@ namespace MvcMovie2.Controllers
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "Id,MovieName,ReleaseDate,Genre,Rating,Price")] Movie movie)
+        //[ValidateAntiForgeryToken]
+        public ActionResult Edit(Movie movie)
         {
             if (ModelState.IsValid)
             {

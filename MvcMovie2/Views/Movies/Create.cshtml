@@ -1,72 +1,76 @@
-﻿@model MvcMovie2.Models.Movie
+﻿<div ng-app="MyMovieApp" ng-controller="CreateMovieController">
+    <form>
+        <div class="form-vertical">
+            <h4>Movie</h4>
+            <hr />
+            <div class="form-group">
+                <label for="Create-Title-Input">Title:</label>
+                <input type="text" class="form-control" id="Create-Title-Input" />
+            </div>
 
-@{
-    ViewBag.Title = "Create";
-}
+            <div class="form-group">
+                <label for="Create-Date-Input">Release Date:</label>
+                <input type="text" class="form-control" id="Create-Date-Input" />
+            </div>
 
-<h2>Create</h2>
+            <div class="form-group">
+                <label for="Create-Genre-Input">Genre:</label>
+                <input type="text" class="form-control" id="Create-Genre-Input" />
+            </div>
 
+            <div class="form-group">
+                <label for="Create-Rating-Input">Rating:</label>
+                <input type="text" class="form-control" id="Create-Rating-Input" />
+            </div>
 
-@using (Html.BeginForm()) //start of input form. EditorFor and ValidationMessage attach to validation rules and error strings specified in Movie class
-{
-    @Html.AntiForgeryToken()
-    
-    <div class="form-horizontal"> 
-        <h4>Movie</h4>
-        <hr />
-        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-        <div class="form-group">
-            @Html.LabelFor(model => model.MovieName, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.MovieName, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.MovieName, "", new { @class = "text-danger" })
+            <div class="form-group">
+                <label for="Create-Price-Input">Price:</label>
+                <input type="text" class="form-control" id="Create-Price-Input" />
+
+            </div>
+            <div class="form-group">
+                <div ng-click="MovieCreate()" class="btn btn-primary">Create</div>
+
             </div>
         </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.ReleaseDate, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.ReleaseDate, new { htmlAttributes = new { @class = "form-control" } }) 
-                @Html.ValidationMessageFor(model => model.ReleaseDate, "", new { @class = "text-danger" })
-            </div> 
-        </div>
-       
-        <div class="form-group">
-            @Html.LabelFor(model => model.Genre, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.Genre, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.Genre, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.Rating, new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.Rating, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.Rating, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.Price, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.Price, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.Price, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Create" class="btn btn-default" />
-            </div>
-        </div>
-    </div>
-}
-
-<div>
-    @Html.ActionLink("Back to List", "Index")
+    </form>
 </div>
+    <div>
+        <a href="/Movies/Index">Back to List</a>
+    </div>
 
-@section Scripts {
-    @Scripts.Render("~/bundles/jqueryval")
-}
+
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/angular-ui/0.4.0/angular-ui.min.js"></script>
+<script>
+    var app = angular.module('MyMovieApp', [])
+
+    app.factory('createmoviefactory', function ($http) {
+        return {
+            CreateMovie: function (movie, callback) {
+                $http({ method: "POST", url: "/Movies/Create", data: movie }).then(function (data) {
+                    callback(data.data);
+                });
+            }
+        }
+    });
+
+    app.controller('CreateMovieController', function ($scope, $http, createmoviefactory) {
+        $scope.movie = {};
+
+        $scope.GetNewMovie = function (callback) {
+            detailsfactory.CreateMovie($scope.NewMovie, callback);
+        }
+        $scope.SetNewMovie = function (response) {
+            $scope.movie = response.data;
+        }
+        $scope.MovieCreate = function () {
+            $scope.movie.MovieName = $('#Create-Title-Input').val();
+            $scope.movie.ReleaseDate = $('#Create-Date-Input').val();
+            $scope.movie.Genre = $('#Create-Genre-Input').val();
+            $scope.movie.Rating = $('#Create-Rating-Input').val();
+            $scope.movie.Price = $('#Create-Price-Input').val();
+            createmoviefactory.CreateMovie($scope.movie, $scope.SetNewMovie);
+        }
+    });
+</script>

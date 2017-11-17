@@ -1,50 +1,9 @@
-﻿@model IEnumerable<MvcMovie2.Models.Movie>
+﻿
 
-@*@{
-    ViewBag.Title = "Movie List";
-}*@
 <div ng-app="MyMovieApp" ng-controller="MovieAngularController">
     <h2>My Movie List</h2>
 
-   @*<p>
-        @Html.ActionLink("Create New", "Create")
-
-        @using (Html.BeginForm("index","movies",FormMethod.Get))
-            {
-                <p>
-                    genre: @Html.DropDownList("movieGenre", "all")
-                    title: @Html.TextBox("searchstring") <br /> //
-                    <input type="submit" value="filter" />
-                </p>
-            }
-
-    <table class="table">
-        @foreach (var movie in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => movie.MovieName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => movie.ReleaseDate)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => movie.Genre)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => movie.Price)
-                </td>
-                <th>
-                    @Html.DisplayFor(modelItem => movie.Rating)
-                </th>
-                <td>
-                    @Html.ActionLink("Edit", "Edit", new { id = movie.ID }) |
-                    @Html.ActionLink("Details", "Details", new { id = movie.ID })  |
-                    @Html.ActionLink("Delete", "Delete", new { id = movie.ID })
-                </td>
-            </tr>
-        }
-    </table>*@
+  
 
     <a href="/Movies/Create">Add New Movie</a>
     <br />
@@ -104,9 +63,9 @@
                     {{ movie.Price | currency }}
                 </td>
                 <td>
-                   <a href="Movies/Edit/{{ movie.Id }}">edit</a> |              @*method/parameters*@
-                    <a href="Movies/Details/{{ movie.Id }}">details</a> |
-                    <a href="Movies/Delete/{{ movie.Id }}">delete</a> 
+                   <a href="/Movies/Edit/{{ movie.Id }}">edit</a> |              @*method/parameters*@
+                    <a href="/Movies/Details/{{ movie.Id }}">details</a> |
+                    <a href="/Movies/Delete/{{ movie.Id }}">delete</a> 
                 </td>
             </tr>
         </tbody>
